@@ -41,9 +41,8 @@ class IOUContract : Contract {
             "A newly issued IOU must have a positive amount." using (output.amount.quantity > 0)
             "The lender and borrower cannot have the same identity." using (output.lender != output.borrower)
 
-            "Both lender and borrower together only may sign IOU issue transaction." using (tx.commands.single().signers.distinct() sameContentWith listOf(output.borrower.owningKey, output.lender.owningKey))
+            "Both lender and borrower together only may sign IOU issue transaction." using
+                    (tx.commands.single().signers.toSet() == output.participants.map { it.owningKey }.toSet())
         }
     }
 }
-
-private infix fun <T> Collection<T>.sameContentWith(collection: Collection<T>?): Boolean = collection?.let { this.size == it.size && this.containsAll(it) } ?: false
